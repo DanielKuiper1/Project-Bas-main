@@ -6,11 +6,21 @@
 require '../../vendor/autoload.php';
 use Bas\classes\Klant;
 
-if(isset($_POST["insert"]) && $_POST["insert"] == "Toevoegen"){
+$klant = new Klant;
 
-		// Code insert klant
-} 
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST["insert"]) && $_POST["insert"] == "Toevoegen") {
+    $klantnaam = $_POST['klantnaam'];
+    $klantemail = $_POST['klantemail'];
+    $klantAdres = $_POST['klantAdres'];
+    $klantPostcode = $_POST['klantPostcode'];
+    $klantwoonplaats = $_POST['klantwoonplaats'];
 
+    if ($klant->insertKlant($klantemail, $klantnaam, $klantAdres, $klantPostcode, $klantwoonplaats)) {
+        echo "Nieuwe klant is succesvol toegevoegd.";
+    } else {
+        echo "Het toevoegen van de nieuwe klant is mislukt.";
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -22,23 +32,18 @@ if(isset($_POST["insert"]) && $_POST["insert"] == "Toevoegen"){
     <link rel="stylesheet" href="../style.css">
 </head>
 <body>
+<h1>CRUD Klant</h1>
+<h2>Toevoegen</h2>	
+<form method="post">
+<input type="text" name="klantnaam" required placeholder="Naam"> *</br>
+<input type="email" name="klantemail" required placeholder="Email"> *</br>
+<input type="text" name="klantAdres" required placeholder="Adres"> *</br>
+<input type="text" name="klantPostcode" required placeholder="Postcode"> *</br>
+<input type="text" name="klantwoonplaats" required placeholder="Woonplaats"> *</br></br>
+<input type="submit" name="insert" value="Toevoegen">
+</form></br>
 
-	<h1>CRUD Klant</h1>
-	<h2>Toevoegen</h2>
-	<form method="post">
-	<label for="nv">Klantnaam:</label>
-	<input type="text" id="nv" name="klantnaam" placeholder="Klantnaam" required/>
-	<br>   
-	<label for="an">Klantemail:</label>
-	<input type="text" id="an" name="klantemail" placeholder="Klantemail" required/>
-	<br><br>
-	<input type='submit' name='insert' value='Toevoegen'>
-	</form></br>
-
-	<a href='read.php'>Terug</a>
+<a href="read.php">Terug</a>
 
 </body>
 </html>
-
-
-
