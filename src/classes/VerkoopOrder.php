@@ -32,6 +32,24 @@ class VerkoopOrder extends Database{
         $this->showTable($lijst);
     }
 
+        // Fetch list of clients
+        public function getKlanten() {
+            $conn = $this->getConnection();
+            $sql = "SELECT klantId, klantNaam FROM klant"; // Ensure 'klanten' is the correct table name
+            $query = $conn->prepare($sql);
+            $query->execute();
+            return $query->fetchAll(PDO::FETCH_ASSOC);
+        }
+    
+        // Fetch list of articles
+        public function getArtikels() {
+            $conn = $this->getConnection();
+            $sql = "SELECT artId, artOmschrijving FROM artikel"; // Ensure 'artikels' is the correct table name
+            $query = $conn->prepare($sql);
+            $query->execute();
+            return $query->fetchAll(PDO::FETCH_ASSOC);
+        }
+
     /**
      * Summary of getVerkoopOrder
      * @return mixed
