@@ -1,22 +1,27 @@
 <?php
 // auteur: studentnaam
 // functie: definitie class VerkoopOrder
+
 namespace Bas\classes;
 
-use Bas\classes\Database;
 use PDO;
 use PDOException;
 
-include_once "functions.php";
-
-class VerkoopOrder extends Database{
+class VerkoopOrder extends Database {
     public $verkOrdId;
     public $klantId;
     public $artId;
     public $verkOrdDatum;
     public $verkOrdBestAantal;
     public $verkOrdStatus;
-    private $table_name = "VerkoopOrder";    
+    private $table_name = "VerkoopOrder";
+    
+    private $statusNames = [
+        0 => 'In behandeling',
+        1 => 'Verzonden',
+        2 => 'Geleverd',
+        3 => 'Geannuleerd'
+    ];
 
     // Methods
     
@@ -32,29 +37,11 @@ class VerkoopOrder extends Database{
         $this->showTable($lijst);
     }
 
-        // Fetch list of clients
-        public function getKlanten() {
-            $conn = $this->getConnection();
-            $sql = "SELECT klantId, klantNaam FROM klant"; // Ensure 'klanten' is the correct table name
-            $query = $conn->prepare($sql);
-            $query->execute();
-            return $query->fetchAll(PDO::FETCH_ASSOC);
-        }
-    
-        // Fetch list of articles
-        public function getArtikels() {
-            $conn = $this->getConnection();
-            $sql = "SELECT artId, artOmschrijving FROM artikel"; // Ensure 'artikels' is the correct table name
-            $query = $conn->prepare($sql);
-            $query->execute();
-            return $query->fetchAll(PDO::FETCH_ASSOC);
-        }
-
     /**
      * Summary of getVerkoopOrder
      * @return mixed
      */
-    function getVerkoopOrder($order = NULL, $direction = 'ASC')
+    public function getVerkoopOrder($order = NULL, $direction = 'ASC')
     {
         // Connect database
         $conn = $this->getConnection();
@@ -67,31 +54,9 @@ class VerkoopOrder extends Database{
         // Select data uit de opgegeven table methode prepare
         $query = $conn->prepare($sql);
         $query->execute();
-        $lijst = $query->fetchAll(PDO::FETCH_ASSOC);
+        $lijst = $query->fetchAll();
     
         return $lijst;
-    }
-
-    /**
-     * Summary of dropDownVerkoopOrder
-     * @param int $row_selected
-     * @return void
-     */
-    public function dropDownVerkoopOrder($row_selected = -1){
-    
-        // Haal alle verkooporders op uit de database mbv de method getVerkoopOrder()
-        $lijst = $this->getVerkoopOrder();
-        
-        echo "<label for='VerkoopOrder'>Choose a verkooporder:</label>";
-        echo "<select name='verkOrdId'>";
-        foreach ($lijst as $row){
-            if($row_selected == $row["verkOrdId"]){
-                echo "<option value='{$row['verkOrdId']}' selected='selected'> {$row['verkOrdDatum']} {$row['verkOrdBestAantal']}</option>\n";
-            } else {
-                echo "<option value='{$row['verkOrdId']}'> {$row['verkOrdDatum']} {$row['verkOrdBestAantal']}</option>\n";
-            }
-        }
-        echo "</select>";
     }
 
     /**
@@ -108,7 +73,7 @@ class VerkoopOrder extends Database{
         $txt = "<table>";
 
         // Voeg de kolomnamen boven de tabel
-        $txt .= getTableHeader($lijst[0]);
+        $txt .= $this->getTableHeader($lijst[0]);
 
         foreach($lijst as $row){
             $txt .= "<tr>";
@@ -117,9 +82,9 @@ class VerkoopOrder extends Database{
             $txt .=  "<td>" . $row["artId"] . "</td>";
             $txt .=  "<td>" . $row["verkOrdDatum"] . "</td>";
             $txt .=  "<td>" . $row["verkOrdBestAantal"] . "</td>";
-            $txt .=  "<td>" . $row["verkOrdStatus"] . "</td>";
+            $txt .=  "<td>" . $this->getStatusName($row["verkOrdStatus"]) . "</td>";
             
-            //Update
+            // Update
             // Wijzig knopje
             $txt .=  "<td>";
             $txt .= " 
@@ -127,7 +92,7 @@ class VerkoopOrder extends Database{
                 <button name='update'>Wzg</button>     
             </form> </td>";
 
-            //Delete
+            // Delete
             $txt .=  "<td>";
             $txt .= " 
             <form method='post' action='delete.php?verkOrdId={$row['verkOrdId']}' >       
@@ -139,68 +104,17 @@ class VerkoopOrder extends Database{
         echo $txt;
     }
 
-    // Delete verkooporder
-    /**
-     * Summary of deleteVerkoopOrder
-     * @param int $verkOrdId
-     * @return bool
-     */
-    public function deleteVerkoopOrder(int $verkOrdId) : bool {
-        $conn = $this->getConnection();
-
-        $sql = "DELETE FROM verkooporder WHERE verkOrdId = :verkOrdId";
-        $query = $conn->prepare($sql);
-        $query->bindParam(':verkOrdId', $verkOrdId, PDO::PARAM_INT);
-        try {
-            return $query->execute();
-        } catch (PDOException $e) {
-            echo "Error: " . $e->getMessage();
-            return false;
-        }
+    public function getStatusNames() {
+        return $this->statusNames;
     }
 
-    /**
-     * Summary of updateVerkoopOrder
-     * @param int $verkOrdId
-     * @param int $klantId
-     * @param int $artId
-     * @param string $verkOrdDatum
-     * @param int $verkOrdBestAantal
-     * @param int $verkOrdStatus
-     * @return bool
-     */
-    public function updateVerkoopOrder(int $verkOrdId, int $klantId, int $artId, string $verkOrdDatum, int $verkOrdBestAantal, int $verkOrdStatus) : bool {
-        $conn = $this->getConnection();
-        $sql = "UPDATE verkooporder 
-        SET 
-        klantId = :klantId, 
-        artId = :artId, 
-        verkOrdDatum = :verkOrdDatum, 
-        verkOrdBestAantal = :verkOrdBestAantal, 
-        verkOrdStatus = :verkOrdStatus
-        WHERE verkOrdId = :verkOrdId";
-        $query = $conn->prepare($sql);
-        $query->bindParam(':klantId', $klantId, PDO::PARAM_INT);
-        $query->bindParam(':artId', $artId, PDO::PARAM_INT);
-        $query->bindParam(':verkOrdDatum', $verkOrdDatum, PDO::PARAM_STR);
-        $query->bindParam(':verkOrdBestAantal', $verkOrdBestAantal, PDO::PARAM_INT);
-        $query->bindParam(':verkOrdStatus', $verkOrdStatus, PDO::PARAM_INT);
-        $query->bindParam(':verkOrdId', $verkOrdId, PDO::PARAM_INT);
-        return $query->execute();
+    public function getStatusName($statusCode) {
+        return $this->statusNames[$statusCode] ?? 'Onbekend';
     }
 
-    /**
-     * Summary of insertVerkoopOrder
-     * @param int $klantId
-     * @param int $artId
-     * @param string $verkOrdDatum
-     * @param int $verkOrdBestAantal
-     * @param int $verkOrdStatus
-     * @return bool
-     */
-    public function insertVerkoopOrder(int $klantId, int $artId, string $verkOrdDatum, int $verkOrdBestAantal, int $verkOrdStatus) : bool {
+    public function insertVerkoopOrder($klantId, $artId, $verkOrdDatum, $verkOrdBestAantal, $verkOrdStatus) {
         $conn = $this->getConnection();
-        $sql = "INSERT INTO {$this->table_name} (klantId, artId, verkOrdDatum, verkOrdBestAantal, verkOrdStatus) 
+        $sql = "INSERT INTO {$this->table_name} (klantId, artId, verkOrdDatum, verkOrdBestAantal, verkOrdStatus)
                 VALUES (:klantId, :artId, :verkOrdDatum, :verkOrdBestAantal, :verkOrdStatus)";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':klantId', $klantId);
@@ -210,15 +124,88 @@ class VerkoopOrder extends Database{
         $stmt->bindParam(':verkOrdStatus', $verkOrdStatus);
         return $stmt->execute();
     }
-    
+
+    public function updateVerkoopOrder($verkOrdId, $klantId, $artId, $verkOrdDatum, $verkOrdBestAantal, $verkOrdStatus) {
+        $conn = $this->getConnection();
+        $sql = "UPDATE {$this->table_name} 
+                SET klantId = :klantId, artId = :artId, verkOrdDatum = :verkOrdDatum, verkOrdBestAantal = :verkOrdBestAantal, verkOrdStatus = :verkOrdStatus
+                WHERE verkOrdId = :verkOrdId";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':klantId', $klantId);
+        $stmt->bindParam(':artId', $artId);
+        $stmt->bindParam(':verkOrdDatum', $verkOrdDatum);
+        $stmt->bindParam(':verkOrdBestAantal', $verkOrdBestAantal);
+        $stmt->bindParam(':verkOrdStatus', $verkOrdStatus);
+        $stmt->bindParam(':verkOrdId', $verkOrdId);
+        return $stmt->execute();
+    }
+
+    public function deleteVerkoopOrder($verkOrdId) {
+        $conn = $this->getConnection();
+        $sql = "DELETE FROM {$this->table_name} WHERE verkOrdId = :verkOrdId";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':verkOrdId', $verkOrdId, PDO::PARAM_INT);
+        try {
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return false;
+        }
+    }
+
     /**
-     * Summary of BepMaxVerkOrdId
-     * @return int
+     * Summary of getKlanten
+     * @return mixed
      */
-	private function BepMaxVerkOrdId() : int {
-		$conn = $this->getConnection();
-		$sql = "SELECT MAX(verkOrdId)+1 FROM {$this->table_name}";
-		return (int) $conn->query($sql)->fetchColumn();
-	}
+    public function getKlanten()
+    {
+        $conn = $this->getConnection();
+        $sql = "SELECT klantId, klantNaam FROM Klant";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Summary of getArtikels
+     * @return mixed
+     */
+    public function getArtikels()
+    {
+        $conn = $this->getConnection();
+        $sql = "SELECT artId, artOmschrijving FROM Artikel";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Summary of getVerkoopOrderById
+     * @param mixed $verkOrdId
+     * @return mixed
+     */
+    public function getVerkoopOrderById($verkOrdId)
+    {
+        $conn = $this->getConnection();
+        $sql = "SELECT * FROM {$this->table_name} WHERE verkOrdId = :verkOrdId";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':verkOrdId', $verkOrdId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Summary of getTableHeader
+     * @param mixed $row
+     * @return string
+     */
+    private function getTableHeader($row) {
+        $txt = "<tr>";
+        foreach ($row as $key => $value) {
+            $txt .= "<th>" . htmlspecialchars($key) . "</th>";
+        }
+        $txt .= "<th>Acties</th></tr>";
+        return $txt;
+    }
 }
 ?>

@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST["insert"]) && $_POST["i
 // Fetch the lists of clients and articles for the dropdowns
 $klanten = $verkoopOrder->getKlanten();
 $artikels = $verkoopOrder->getArtikels();
+$statusNames = $verkoopOrder->getStatusNames();
 ?>
 
 <!DOCTYPE html>
@@ -55,7 +56,12 @@ $artikels = $verkoopOrder->getArtikels();
     
     <input type="date" name="verkOrdDatum" required placeholder="Datum"> *</br>
     <input type="number" name="verkOrdBestAantal" required placeholder="Bestel Aantal"> *</br>
-    <input type="number" name="verkOrdStatus" required placeholder="Status"> *</br></br>
+    <label for="verkOrdStatus">Status:</label>
+    <select name="verkOrdStatus" required>
+        <?php foreach ($statusNames as $statusCode => $statusName): ?>
+            <option value="<?= $statusCode ?>"><?= $statusName ?></option>
+        <?php endforeach; ?>
+    </select> *</br></br>
     <input type="submit" name="insert" value="Toevoegen">
 </form></br>
 

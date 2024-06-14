@@ -1,5 +1,5 @@
 <!--
-    Auteur: Studentnaam
+    Auteur: Daniel
     Function: home page CRUD VerkoopOrder
 -->
 <!DOCTYPE html>

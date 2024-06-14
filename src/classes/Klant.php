@@ -118,6 +118,17 @@ class Klant extends Database{
 		echo $txt;
 	}
 
+	public function searchKlantByName(string $searchTerm) {
+		$conn = $this->getConnection();
+		$sql = "SELECT * FROM {$this->table_name} WHERE klantNaam LIKE :searchTerm";
+		$query = $conn->prepare($sql);
+		$searchTerm = "%$searchTerm%";
+		$query->bindParam(':searchTerm', $searchTerm, PDO::PARAM_STR);
+		$query->execute();
+		return $query->fetchAll(PDO::FETCH_ASSOC);
+	}
+	
+
 	// Delete klant
  /**
   * Summary of deleteKlant
