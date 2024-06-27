@@ -1,4 +1,6 @@
 <?php
+
+
 // auteur: studentnaam
 // functie: delete class Klant
 
