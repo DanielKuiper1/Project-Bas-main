@@ -14,7 +14,7 @@
 <body>
     <h1>CRUD Artikel</h1>
     <nav>
-        <a href='../index.html'>Home</a><br>
+        <a href='../index.php'>Home</a><br>
         <a href='insert.php'>Toevoegen nieuw artikel</a><br><br>
     </nav>
     
@@ -27,6 +27,22 @@ use Bas\classes\Artikel;
 
 // Maak een object Artikel
 $artikel = new Artikel;
+
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['username'])) {
+    header('Location: login.php');
+    exit();
+}
+
+$username = $_SESSION['username'];
+
+// Check if user has permission based on role
+if ($username !== 'magazijn' && $username !== 'Admin') {
+    echo "Unauthorized access!";
+    exit();
+}
 
 // Start CRUD
 $artikel->crudArtikel();

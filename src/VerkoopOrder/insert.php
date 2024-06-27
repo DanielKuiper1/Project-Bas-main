@@ -8,6 +8,22 @@ use Bas\classes\VerkoopOrder;
 
 $verkoopOrder = new VerkoopOrder;
 
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['username'])) {
+    header('Location: login.php');
+    exit();
+}
+
+$username = $_SESSION['username'];
+
+// Check if user has permission based on role
+if ($username !== 'Verkoper' && $username !== 'Admin') {
+    echo "Unauthorized access!";
+    exit();
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST["insert"]) && $_POST["insert"] == "Toevoegen") {
     $klantId = $_POST['klantId'];
     $artId = $_POST['artId'];

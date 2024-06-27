@@ -8,6 +8,22 @@ use Bas\classes\Klant;
 
 $klant = new Klant;
 
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['username'])) {
+    header('Location: login.php');
+    exit();
+}
+
+$username = $_SESSION['username'];
+
+// Check if user has permission based on role
+if ($username !== 'Admin') {
+    echo "Unauthorized access!";
+    exit();
+}
+
 if (isset($_GET['klantId']) && is_numeric($_GET['klantId'])) {
     $klantId = (int)$_GET['klantId'];
 

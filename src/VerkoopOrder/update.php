@@ -1,8 +1,21 @@
 <?php
-// auteur: studentnaam
-// functie: update class VerkoopOrder
 
-// Autoloader classes via composer
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['username'])) {
+    header('Location: login.php');
+    exit();
+}
+
+$username = $_SESSION['username'];
+
+// Check if user has permission based on role
+if ($username !== 'Verkoper' && $username !== 'Admin') {
+    echo "Unauthorized access!";
+    exit();
+}
+
 require '../../vendor/autoload.php';
 use Bas\classes\VerkoopOrder;
 

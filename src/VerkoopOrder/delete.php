@@ -8,6 +8,22 @@ use Bas\classes\VerkoopOrder;
 
 $verkoopOrder = new VerkoopOrder();
 
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['username'])) {
+    header('Location: login.php');
+    exit();
+}
+
+$username = $_SESSION['username'];
+
+// Check if user has permission based on role
+if ($username !== 'Verkoper' && $username !== 'Admin') {
+    echo "Unauthorized access!";
+    exit();
+}
+
 if (isset($_GET['verkOrdId']) && is_numeric($_GET['verkOrdId'])) {
     $verkOrdId = (int)$_GET['verkOrdId'];
 

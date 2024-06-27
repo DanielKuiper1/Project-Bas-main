@@ -14,7 +14,7 @@
 <body>
     <h1>CRUD Klant</h1>
     <nav>
-        <a href='../index.html'>Home</a><br>
+        <a href='../index.php'>Home</a><br>
         <a href='insert.php'>Toevoegen nieuwe klant</a><br><br>
     </nav>
 
@@ -26,6 +26,21 @@
     <br>
 
 <?php
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['username'])) {
+    header('Location: login.php');
+    exit();
+}
+
+$username = $_SESSION['username'];
+
+// Check if user has permission based on role
+if ($username !== 'klanten' && $username !== 'Admin') {
+    echo "Unauthorized access!";
+    exit();
+}
 
 // Autoloader classes via composer
 require '../../vendor/autoload.php';

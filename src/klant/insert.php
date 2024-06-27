@@ -1,4 +1,20 @@
 <?php
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['username'])) {
+    header('Location: login.php');
+    exit();
+}
+
+$username = $_SESSION['username'];
+
+// Check if user has permission based on role
+if ($username !== 'klanten' && $username !== 'Admin') {
+    echo "Unauthorized access!";
+    exit();
+}
+
 // auteur: studentnaam
 // functie: insert class Klant
 

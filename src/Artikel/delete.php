@@ -6,6 +6,22 @@
 require '../../vendor/autoload.php';
 use Bas\classes\Artikel;
 
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['username'])) {
+    header('Location: login.php');
+    exit();
+}
+
+$username = $_SESSION['username'];
+
+// Check if user has permission based on role
+if ($username !== 'magazijn' && $username !== 'Admin') {
+    echo "Unauthorized access!";
+    exit();
+}
+
 $artikel = new Artikel;
 
 if (isset($_GET['artId']) && is_numeric($_GET['artId'])) {

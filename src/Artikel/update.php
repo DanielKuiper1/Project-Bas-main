@@ -8,6 +8,22 @@ use Bas\classes\Artikel;
 
 $artikel = new Artikel;
 
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['username'])) {
+    header('Location: login.php');
+    exit();
+}
+
+$username = $_SESSION['username'];
+
+// Check if user has permission based on role
+if ($username !== 'magazijn' && $username !== 'Admin') {
+    echo "Unauthorized access!";
+    exit();
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST["update"]) && $_POST["update"] == "Wzg") {
     $artId = $_GET['artId'] ?? null;
     $artOmschrijving = $_POST['artOmschrijving'] ?? null;
